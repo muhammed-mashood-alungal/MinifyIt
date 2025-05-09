@@ -15,5 +15,4 @@ export class UserRepository {
   async getUserByEmail(email :string) : Promise<UserDocument | null> {
     return await this.userModel.findOne({email : email})
   }
-  
 }

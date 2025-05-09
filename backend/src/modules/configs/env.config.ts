@@ -30,5 +30,8 @@ export const env = {
   },
   get JWT_SECRET(){
     return envVars.JWT_SECRET
+  },
+  get CLIENT_URL(){
+    return envVars.CLIENT_URL
   }
 };
