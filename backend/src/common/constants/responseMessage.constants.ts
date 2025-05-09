@@ -8,5 +8,9 @@ export const HttpResponse = {
   INVALID_CREDITIAL: 'Invalid Creditials',
   ERROR_WHILE_HASHING_PASS: 'Something Went Wrong While Hashing Password',
   ERROR_WHILE_COMPARING_PASS:'Something Went Wrong While Comparing Password',
-  LOGIN_SUCCESS:'Login Successfull'
+  LOGIN_SUCCESS:'Login Successfull',
+  UNAUTHORIZED:"Unauthorized",
+  NO_TOKEN:"No Token Provided",
+  USER_NOT_FOUND:"No User Found",
+  OK:"OK"
 };

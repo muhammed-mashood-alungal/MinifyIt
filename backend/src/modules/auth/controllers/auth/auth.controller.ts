@@ -2,20 +2,24 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseFilters,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../dto/createUserDto.dto';
 import { AllExceptionsFilter } from 'src/common/filters/http-exception.filter';
 import { AuthService } from '../../services/auth/auth.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { successResponse } from 'src/common/utils/reponse.util';
 import { HttpResponse } from 'src/common/constants/responseMessage.constants';
 import { VerifyOtpDto } from '../../dto/verifyOtp.dto';
 import { ResendOtpDto } from '../../dto/resendOtp.dto';
 import { LoginDto } from '../../dto/login.dto';
+import { setHeapSnapshotNearHeapLimit } from 'node:v8';
+import { verifyToken } from 'src/common/utils/jwt.util';
 
 @Controller('auth')
 @UseFilters(new AllExceptionsFilter())
@@ -45,8 +49,24 @@ export class AuthController {
   }
 
   @Post('signin')
-  async singIn(@Body() signInData : LoginDto , @Res() res : Response){
-    const token = await this.authServices.signIn(signInData)
-    successResponse(res , HttpStatus.OK , HttpResponse.LOGIN_SUCCESS , {token})
+  async singIn(@Body() signInData: LoginDto, @Res() res: Response) {
+    const token = await this.authServices.signIn(signInData);
+    successResponse(res, HttpStatus.OK, HttpResponse.LOGIN_SUCCESS, { token });
+  }
+  @Post('me')
+  async authMe(@Req() req: Request, @Res() res: Response) {
+    const header = req.headers.authorization;
+    if (!header || header.startsWith('Bearer ')) {
+      throw new HttpException(
+        HttpResponse.UNAUTHORIZED,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const token = header.split(' ')[1];
+    if (!token) {
+      throw new HttpException(HttpResponse.NO_TOKEN, HttpStatus.NOT_FOUND);
+    }
+    const user = this.authServices.authMe(token);
+    successResponse(res, HttpStatus.OK, HttpResponse.OK, { user });
   }
 }

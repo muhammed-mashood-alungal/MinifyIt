@@ -9,7 +9,9 @@ import { sendOtp } from 'src/common/utils/sendEmail.util';
 import { HttpResponse } from 'src/common/constants/responseMessage.constants';
 import { string } from 'zod';
 import { LoginDto } from '../../dto/login.dto';
-import { generateToken } from 'src/common/utils/jwt.util';
+import { generateToken, verifyToken } from 'src/common/utils/jwt.util';
+import { UserDocument } from 'src/schema/user.schema';
+import { serialize } from 'v8';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +78,7 @@ export class AuthService {
     );
   }
 
-  async signIn(signInData: LoginDto) : Promise<string> {
+  async signIn(signInData: LoginDto): Promise<string> {
     const user = await this.userRepository.getUserByEmail(signInData.email);
 
     if (!user) {
@@ -86,18 +88,24 @@ export class AuthService {
       );
     }
 
-    const isVerified = validatePassword(signInData.password , user.password)
-    if(!isVerified){
-        throw new HttpException(
+    const isVerified = validatePassword(signInData.password, user.password);
+    if (!isVerified) {
+      throw new HttpException(
         HttpResponse.INVALID_CREDITIAL,
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-
-    const payload = {id : user._id , email : user.email}
-    const token = await generateToken(payload)
-    return token
-
+    const payload = { id: user._id, email: user.email };
+    const token = await generateToken(payload);
+    return token;
+  }
+  async authMe(token: string): Promise<UserDocument> {
+    const payload = await verifyToken(token);
+    const user = await this.userRepository.getUserByEmail(payload.email);
+    if(!user){
+       throw new HttpException(HttpResponse.USER_NOT_FOUND , HttpStatus.NOT_FOUND)
+    }
+    return user;
   }
 }
