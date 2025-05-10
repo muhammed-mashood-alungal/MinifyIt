@@ -4,15 +4,13 @@ import { AuthService } from './services/auth/auth.service';
 import { UserRepository } from './repositories/user.repositories';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schema/user.schema';
-import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports:[
-    MongooseModule.forFeature([{name : User.name , schema : UserSchema}]),
-    CacheModule.register()
+  imports: [
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AuthController],
-  providers: [AuthService , UserRepository]
+  providers: [AuthService, UserRepository],
+  exports: [AuthService, UserRepository],
 })
 export class AuthModule {}
-   

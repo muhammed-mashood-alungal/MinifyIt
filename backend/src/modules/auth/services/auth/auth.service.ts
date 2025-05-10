@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from '../../dto/createUserDto.dto';
 import { UserRepository } from '../../repositories/user.repositories';
 import { hashPassword, validatePassword } from 'src/common/utils/bcrypt.util';
@@ -7,16 +7,17 @@ import { Cache } from 'cache-manager';
 import { generateOtp } from 'src/common/utils/otp.util';
 import { sendOtp } from 'src/common/utils/sendEmail.util';
 import { HttpResponse } from 'src/common/constants/responseMessage.constants';
-import { string } from 'zod';
+
 import { LoginDto } from '../../dto/login.dto';
 import { generateToken, verifyToken } from 'src/common/utils/jwt.util';
 import { UserDocument } from 'src/schema/user.schema';
-import { serialize } from 'v8';
+
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -32,35 +33,52 @@ export class AuthService {
     const hashedPassword = await hashPassword(userData.password);
 
     const otp = generateOtp();
-
     await sendOtp(userData.email, otp);
 
-    const response = await this.cacheManager.set(
-      userData.email,
-      JSON.stringify({
+    
+    const email = userData.email;
+    
+      const dataToStore = {
         ...userData,
         password: hashedPassword,
         otp,
-      }),
-      3600,
-    );
-    if (!response) {
-      throw new HttpException(
-        HttpResponse.INTERNAL_SERVER_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+      };
+      
+      await this.cacheManager.set(email, dataToStore, 600000);
+      
+      
+      const cachedData = await this.cacheManager.get(email);
+      
+      
+      if (!cachedData) {
+        throw new HttpException(
+          HttpResponse.OTP_STORING_FAILED,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
   }
+
+
   async verifyOtp(email: string, otp: string) {
-    const userData = JSON.parse((await this.cacheManager.get(email)) as string);
+      const cachedData = await this.cacheManager.get(email) as any;
+      
+      if (!cachedData) {
+        throw new HttpException(
+         HttpResponse.INVALID_OTP,
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      const userData = cachedData;
+      
+      if (userData.otp != otp) {
+        throw new HttpException(HttpResponse.INVALID_OTP, HttpStatus.BAD_REQUEST);
+      }
 
-    if (userData.otp != otp) {
-      throw new HttpException(HttpResponse.INVALID_OTP, HttpStatus.BAD_REQUEST);
-    }
+     
+      delete userData.otp;
 
-    delete userData.otp;
-
-    await this.userRepository.createUser(userData);
+      
+      await this.userRepository.createUser(userData);
   }
   async resendOtp(email: string) {
     const otp = generateOtp();
@@ -75,7 +93,7 @@ export class AuthService {
         otp: otp,
       }),
       3600,
-    );
+    );   
   }
 
   async signIn(signInData: LoginDto): Promise<string> {
@@ -100,12 +118,16 @@ export class AuthService {
     const token = await generateToken(payload);
     return token;
   }
-  async authMe(token: string): Promise<UserDocument> {
+  async authMe(token: string): Promise<{id:string , email : string}> {
     const payload = await verifyToken(token);
+    console.log(payload)
     const user = await this.userRepository.getUserByEmail(payload.email);
-    if(!user){
-       throw new HttpException(HttpResponse.USER_NOT_FOUND , HttpStatus.NOT_FOUND)
+    if (!user) {
+      throw new HttpException(
+        HttpResponse.USER_NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
     }
-    return user;
+    return payload;
   }
 }

@@ -12,5 +12,6 @@ export const HttpResponse = {
   UNAUTHORIZED:"Unauthorized",
   NO_TOKEN:"No Token Provided",
   USER_NOT_FOUND:"No User Found",
-  OK:"OK"
+  OK:"OK",
+  OTP_STORING_FAILED:'Failed To Store.Please Try Later'
 };

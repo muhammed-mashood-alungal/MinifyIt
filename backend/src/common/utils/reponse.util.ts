@@ -6,5 +6,5 @@ export const successResponse = (
   message?: string,
   data?: any,
 ) => {
-  res.status(status).json({ message, data : data });
+  res.status(status).json({ message,  ...data});
 };

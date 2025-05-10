@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -18,8 +17,6 @@ import { HttpResponse } from 'src/common/constants/responseMessage.constants';
 import { VerifyOtpDto } from '../../dto/verifyOtp.dto';
 import { ResendOtpDto } from '../../dto/resendOtp.dto';
 import { LoginDto } from '../../dto/login.dto';
-import { setHeapSnapshotNearHeapLimit } from 'node:v8';
-import { verifyToken } from 'src/common/utils/jwt.util';
 
 @Controller('auth')
 @UseFilters(new AllExceptionsFilter())
@@ -38,6 +35,7 @@ export class AuthController {
   @Post('verify-otp')
   async verifyOtp(@Body() body: VerifyOtpDto, @Res() res: Response) {
     const { email, otp } = body;
+    console.log(email , otp)
     await this.authServices.verifyOtp(email, otp);
     successResponse(res, HttpStatus.OK, HttpResponse.OTP_VERIFIED);
   }
@@ -55,6 +53,7 @@ export class AuthController {
   }
   @Post('me')
   async authMe(@Req() req: Request, @Res() res: Response) {
+    console.log('HIT ')
     const header = req.headers.authorization;
     if (!header || header.startsWith('Bearer ')) {
       throw new HttpException(
@@ -66,7 +65,8 @@ export class AuthController {
     if (!token) {
       throw new HttpException(HttpResponse.NO_TOKEN, HttpStatus.NOT_FOUND);
     }
-    const user = this.authServices.authMe(token);
+    const user =await this.authServices.authMe(token);
+
     successResponse(res, HttpStatus.OK, HttpResponse.OK, { user });
   }
 }
