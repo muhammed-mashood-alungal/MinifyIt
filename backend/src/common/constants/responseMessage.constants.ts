@@ -13,5 +13,7 @@ export const HttpResponse = {
   NO_TOKEN:"No Token Provided",
   USER_NOT_FOUND:"No User Found",
   OK:"OK",
-  OTP_STORING_FAILED:'Failed To Store.Please Try Later'
+  OTP_STORING_FAILED:'Failed To Store.Please Try Later',
+  ERROR_SENDING_OTP:"Error While Sending The OTP Please Try Again",
+  INVALID_ENV :"Invalid environment variables"
 };

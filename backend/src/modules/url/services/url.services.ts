@@ -11,11 +11,10 @@ export class UrlServices {
   constructor(private readonly urlRepository: UrlRepository) {}
 
   async createNewUrl(data: CreateUrlDto): Promise<string | null> {
-    console.log('HELLO')
     const existingUrlData = await this.urlRepository.getShortUrlByOriginalUrl(
       data.originalUrl,
     );
-    console.log(data.originalUrl , existingUrlData)
+
     if (existingUrlData) {
       return existingUrlData.shortUrl;
     }
@@ -34,10 +33,14 @@ export class UrlServices {
     });
     return newUrlData.shortUrl;
   }
+
+  
   async getOrginalUrl(shortCode: string): Promise<string | undefined> {
     const urlData = await this.urlRepository.getShortUrlByCode(shortCode);
     return urlData?.originalUrl;
   }
+
+
   async getUserUrls(userId : unknown ) : Promise<UrlDocument[]>{
     return await this.urlRepository.getUserUrls(userId as Types.ObjectId)
   }

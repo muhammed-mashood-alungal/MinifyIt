@@ -16,7 +16,6 @@ import { HttpResponse } from 'src/common/constants/responseMessage.constants';
 
 import { LoginDto } from '../../dto/login.dto';
 import { generateToken, verifyToken } from 'src/common/utils/jwt.util';
-import { UserDocument } from 'src/schema/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -76,6 +75,7 @@ export class AuthService {
 
     await this.userRepository.createUser(userData);
   }
+
   async resendOtp(email: string) {
     const otp = generateOtp();
     await sendOtp(email, otp);
@@ -100,8 +100,10 @@ export class AuthService {
       );
     }
 
-    const isVerified = await validatePassword(signInData.password, user.password);
-    console.log(isVerified)
+    const isVerified = await validatePassword(
+      signInData.password,
+      user.password,
+    );
     if (!isVerified) {
       throw new HttpException(
         HttpResponse.INVALID_CREDITIAL,
@@ -113,6 +115,7 @@ export class AuthService {
     const token = await generateToken(payload);
     return token;
   }
+
   async authMe(token: string): Promise<{ id: string; email: string }> {
     const payload = await verifyToken(token);
     const user = await this.userRepository.getUserByEmail(payload.email);

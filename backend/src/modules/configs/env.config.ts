@@ -1,13 +1,13 @@
 import { envSchema } from 'src/validations/env.schema';
 import * as dotenv from 'dotenv';
+import { HttpResponse } from 'src/common/constants/responseMessage.constants';
 
 dotenv.config()
 
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error(' Invalid environment variables:', parsed.error.format());
-  throw new Error('Invalid environment variables');
+  throw new Error(HttpResponse.INVALID_ENV);
 }
 
 
@@ -28,10 +28,13 @@ export const env = {
   get NODEMAILER_PASSKEY(){
     return envVars.NODEMAILER_PASSKEY
   },
-  get JWT_SECRET(){
+  get JWT_SECRET(){ 
     return envVars.JWT_SECRET
   },
   get CLIENT_URL(){
     return envVars.CLIENT_URL
+  },
+  get REDIS_URL(){
+    return envVars.REDIS_URL
   }
 };

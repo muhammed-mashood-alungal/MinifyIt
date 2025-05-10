@@ -4,7 +4,6 @@ import { Url, UrlSchema } from 'src/schema/url.schema';
 import { UrlController } from './controllers/url.controlller';
 import { UrlServices } from './services/url.services';
 import { UrlRepository } from './repositories/url.repositories';
-import { UserRepository } from '../auth/repositories/user.repositories';
 
 @Module({
     imports: [

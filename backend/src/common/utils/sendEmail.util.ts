@@ -1,4 +1,5 @@
 import transporter from "src/modules/configs/mail.config";
+import { HttpResponse } from "../constants/responseMessage.constants";
 
 export const sendOtp = async (email: string, otp: string) => {
   try {
@@ -16,6 +17,6 @@ export const sendOtp = async (email: string, otp: string) => {
     };
     await transporter.sendMail(options);
   } catch (error) {
-    throw new Error('Error Sending otp email');
+    throw new Error(HttpResponse.ERROR_SENDING_OTP);
   }
 };

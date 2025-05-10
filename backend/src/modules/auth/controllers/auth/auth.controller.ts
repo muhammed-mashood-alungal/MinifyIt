@@ -32,13 +32,14 @@ export class AuthController {
       HttpResponse.OTP_SEND_SUCCESSFULLY,
     );
   }
+
   @Post('verify-otp')
   async verifyOtp(@Body() body: VerifyOtpDto, @Res() res: Response) {
     const { email, otp } = body;
-    console.log(email , otp)
     await this.authServices.verifyOtp(email, otp);
     successResponse(res, HttpStatus.OK, HttpResponse.OTP_VERIFIED);
   }
+
   @Post('resend-otp')
   async resendOtp(@Body() body: ResendOtpDto, @Res() res: Response) {
     const { email } = body;
@@ -51,9 +52,9 @@ export class AuthController {
     const token = await this.authServices.signIn(signInData);
     successResponse(res, HttpStatus.OK, HttpResponse.LOGIN_SUCCESS, { token });
   }
+  
   @Post('me')
   async authMe(@Req() req: Request, @Res() res: Response) {
-    
     const header = req.headers.authorization;
     if (!header || header.startsWith('Bearer ')) {
       throw new HttpException(
@@ -65,7 +66,7 @@ export class AuthController {
     if (!token) {
       throw new HttpException(HttpResponse.NO_TOKEN, HttpStatus.NOT_FOUND);
     }
-    const user =await this.authServices.authMe(token);
+    const user = await this.authServices.authMe(token);
 
     successResponse(res, HttpStatus.OK, HttpResponse.OK, { user });
   }

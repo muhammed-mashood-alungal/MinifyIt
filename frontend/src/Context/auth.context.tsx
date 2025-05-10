@@ -30,10 +30,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const checkAuth = async () => {
     try {
-      console.log('heaweadfasdf')
       const res : User = await AuthServices.authMe() as User
-      console.log("set user as")
-      console.log(res)
       setUser(res)
     } catch (error) {
       setUser(null)

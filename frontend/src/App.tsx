@@ -16,7 +16,6 @@ function App() {
   const {checkAuth} = useAuth()
   useEffect(()=>{
     checkAuth()
-    console.log('he')
   },[])
 
   return (

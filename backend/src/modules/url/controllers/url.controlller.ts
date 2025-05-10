@@ -19,10 +19,10 @@ export class UrlController {
 
   @Post('/create')
   async createNewUrl(@Body() data: CreateUrlDto, @Res() res: Response) {
-    console.log('data is', data);
     const shortedUrl = await this.urlServices.createNewUrl(data);
     successResponse(res, HttpStatus.CREATED, HttpResponse.OK, { shortedUrl });
   }
+
 
   @Get('/:shortCode')
   async getOrginalUrl(
@@ -36,9 +36,13 @@ export class UrlController {
     successResponse(res, HttpStatus.OK, HttpResponse.OK, { originalUrl });
   }
 
+  
   @Get('/my-links/:userId')
-  async getUserLinks(@Param() params : {userId : string}, @Res() res :Response){
-    const links = await this.urlServices.getUserUrls(params?.userId)
-     successResponse(res, HttpStatus.OK, HttpResponse.OK, { links });
+  async getUserLinks(
+    @Param() params: { userId: string },
+    @Res() res: Response,
+  ) {
+    const links = await this.urlServices.getUserUrls(params?.userId);
+    successResponse(res, HttpStatus.OK, HttpResponse.OK, { links });
   }
 }

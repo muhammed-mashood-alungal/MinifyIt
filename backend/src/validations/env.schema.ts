@@ -7,5 +7,6 @@ export const envSchema = z.object({
     SENDER_EMAIL:z.string(),
     NODEMAILER_PASSKEY:z.string(),
     JWT_SECRET:z.string(),
-    CLIENT_URL:z.string().url()
+    CLIENT_URL:z.string().url(),
+    REDIS_URL:z.string()
 })

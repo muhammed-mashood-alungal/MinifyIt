@@ -10,11 +10,9 @@ function UrlShortner() {
   const [error, setError] = useState("");
   const { user } = useAuth();
   const shortenUrl = async () => {
-    // Reset states
     setError("");
     setShortUrl("");
 
-    // Validate URL
     if (!longUrl.trim()) {
       setError("Please enter a URL");
       return;
@@ -25,9 +23,7 @@ function UrlShortner() {
       return;
     }
 
-    // Simulate API call
     setIsLoading(true);
-    console.log('sending' , longUrl , user?.id)
     const newShortUrl = await UrlServices.createShortUrl(
       longUrl,
       user?.id as string
@@ -51,22 +47,7 @@ function UrlShortner() {
   };
 
   const [copySuccess, setCopySuccess] = useState(false);
-  const [urlHistory, setUrlHistory] = useState([
-    {
-      original:
-        "https://www.example.com/very/long/url/that/nobody/wants/to/type/or/remember",
-      shortened: "min.fy/abc123",
-      clicks: 24,
-      date: "2025-05-08",
-    },
-    {
-      original:
-        "https://another-very-long-example.com/with/multiple/parameters?id=123&type=example",
-      shortened: "min.fy/def456",
-      clicks: 12,
-      date: "2025-05-09",
-    },
-  ]);
+ 
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard

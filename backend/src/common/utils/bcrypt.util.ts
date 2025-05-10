@@ -1,6 +1,5 @@
 import * as bcrypt from 'bcryptjs';
 import { HttpResponse } from '../constants/responseMessage.constants';
-import { retry } from 'rxjs';
 export const hashPassword = async (password: string): Promise<string> => {
   try {
     const salt = 10;

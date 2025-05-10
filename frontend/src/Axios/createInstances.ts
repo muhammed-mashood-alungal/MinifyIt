@@ -8,5 +8,5 @@ const createAxiosInstance = (baseUrl: string) => {
   return instance;
 };
 
-export const authInstance = createAxiosInstance(`http://localhost:5000/auth/`)
-export const urlInstance = createAxiosInstance(`http://localhost:5000/url/`)
+export const authInstance = createAxiosInstance(`${import.meta.env.VITE_API_URL}/auth`)
+export const urlInstance = createAxiosInstance(`${import.meta.env.VITE_API_URL}/url`)

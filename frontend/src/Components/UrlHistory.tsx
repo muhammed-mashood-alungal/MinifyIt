@@ -53,7 +53,7 @@ function UrlHistory() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {urlHistory.map((url : any, index) => (
+              {urlHistory.map((url: any, index) => (
                 <tr key={index}>
                   <td className="px-4 py-3 text-sm text-gray-300">
                     <div className="truncate max-w-xs">{url.originalUrl}</div>
@@ -70,9 +70,7 @@ function UrlHistory() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <button
-                      onClick={() =>
-                        copyToClipboard(url.shortUrl)
-                      }
+                      onClick={() => copyToClipboard(url.shortUrl)}
                       className="p-1 text-gray-400 hover:text-indigo-400 focus:outline-none"
                     >
                       {copySuccess ? (

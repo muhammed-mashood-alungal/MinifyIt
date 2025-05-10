@@ -1,33 +1,35 @@
-import {
-  Link,
-} from "lucide-react";
+import { Link } from "lucide-react";
 import UrlShortner from "../../Components/UrlShortner";
 import UrlHistory from "../../Components/UrlHistory";
 import { useAuth } from "../../Context/auth.context";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
-    const {logout , user ,loading} = useAuth()
-    const navigate = useNavigate()
-    useEffect(()=>{
-        if(!user && !loading){
-            navigate('/login')
-        } 
-    },[user , loading])
+  const { logout, user, loading } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate("/login");
+    }
+  }, [user, loading]);
   return (
     <div className="flex flex-col min-h-screen bg-gray-900">
       {/* Header */}
       <header className="bg-gray-800 shadow-md py-4">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
-            <div className="flex
-            ">
+            <div
+              className="flex
+            "
+            >
               <Link className="text-indigo-400 h-8 w-8 mr-2" />
               <h1 className="text-2xl font-bold text-white">MinifyIt</h1>
             </div>
             <div>
-                <button className="text-red-500 " onClick={logout}>Logout</button>
+              <button className="text-red-500 " onClick={logout}>
+                Logout
+              </button>
             </div>
           </div>
         </div>

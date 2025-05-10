@@ -19,18 +19,16 @@ import { redisStore } from 'cache-manager-redis-store';
         store: redisStore,
         host: 'localhost',
         port: 6379,
-        ttl: 600, // Default TTL of 10 minutes
-         password: '123', // Uncomment if needed
-        // db: 0, // Redis database index
+        ttl: 600,
       }),
     }),
   ],
-  controllers: [], // Remove AuthController from here
+  controllers: [], 
   providers: [
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor,
     },
-  ], // Remove AuthService from here
+  ],
 })
 export class AppModule {}

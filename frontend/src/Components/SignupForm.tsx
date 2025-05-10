@@ -45,23 +45,22 @@ function SignupForm() {
   const handleSubmit = async (e: SyntheticEvent) => {
     try {
       e.preventDefault();
-    const validation = signupSchema.safeParse(formData);
-    if (!validation.success) {
-      const fieldErrors: typeof errors = {};
-      validation.error.errors.forEach((err) => {
-        const field = err.path[0] as keyof typeof errors;
-        fieldErrors[field] = err.message;
-      });
-      setErrors(fieldErrors);
-      return;
+      const validation = signupSchema.safeParse(formData);
+      if (!validation.success) {
+        const fieldErrors: typeof errors = {};
+        validation.error.errors.forEach((err) => {
+          const field = err.path[0] as keyof typeof errors;
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+      setErrors({});
+      await AuthServices.signUp(formData);
+      navigate("/verify-otp", { state: { email: formData.email } });
+    } catch (error: unknown) {
+      toast.error((error as Error).message || "Something Went While SignUp");
     }
-    setErrors({});
-    await AuthServices.signUp(formData);
-    navigate('/verify-otp',{state:{email:formData.email}});
-    } catch (error : unknown) {
-      toast.error((error as Error).message || "Something Went While SignUp")
-    }
-    
   };
 
   return (
@@ -73,14 +72,15 @@ function SignupForm() {
           <input
             type="text"
             name="username"
-            
             placeholder="John Doe"
             className="pl-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
             value={formData.username}
           />
         </div>
-        {errors.username && <p className="text-sm text-red-500 mt-1">{errors.username}</p>}
+        {errors.username && (
+          <p className="text-sm text-red-500 mt-1">{errors.username}</p>
+        )}
       </div>
 
       <div>
@@ -90,14 +90,15 @@ function SignupForm() {
           <input
             type="email"
             name="email"
-            
             placeholder="you@example.com"
             className="pl-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
             value={formData.email}
           />
         </div>
-        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+        {errors.email && (
+          <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+        )}
       </div>
 
       <div>
@@ -107,7 +108,6 @@ function SignupForm() {
           <input
             type={showPassword ? "text" : "password"}
             name="password"
-            
             placeholder="••••••••"
             className="pl-10 pr-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
@@ -125,7 +125,9 @@ function SignupForm() {
             )}
           </button>
         </div>
-        {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
+        {errors.password && (
+          <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+        )}
       </div>
 
       <div>
@@ -135,14 +137,15 @@ function SignupForm() {
           <input
             type={showPassword ? "text" : "password"}
             name="confirmPassword"
-            
             placeholder="••••••••"
             className="pl-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
             value={formData.confirmPassword}
           />
         </div>
-        {errors.confirmPassword && <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>}
+        {errors.confirmPassword && (
+          <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>
+        )}
       </div>
 
       <button

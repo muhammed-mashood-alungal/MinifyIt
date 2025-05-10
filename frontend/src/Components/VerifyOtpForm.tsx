@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import {
-    use,
+  use,
   useEffect,
   useState,
   type ChangeEvent,
@@ -13,9 +13,9 @@ import toast from "react-hot-toast";
 function VerifyOtp() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(60);
-  const location = useLocation()
-  const navigate = useNavigate()
-  let email  = location?.state?.email
+  const location = useLocation();
+  const navigate = useNavigate();
+  let email = location?.state?.email;
 
   useEffect(() => {
     if (timer > 0) {
@@ -25,12 +25,12 @@ function VerifyOtp() {
     }
   }, [timer]);
 
-  useEffect(()=>{
-    if(!email){
-        navigate('/signup')
-        email = null
+  useEffect(() => {
+    if (!email) {
+      navigate("/signup");
+      email = null;
     }
-  },[])
+  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -39,23 +39,23 @@ function VerifyOtp() {
     setOtp(value);
   };
 
-  const handleSubmit = async(e: SyntheticEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     try {
-        e.preventDefault();
-        await  AuthServices.verifyOtp(email , otp)
-        navigate('/login')
+      e.preventDefault();
+      await AuthServices.verifyOtp(email, otp);
+      navigate("/login");
     } catch (error) {
-        toast.error("Something Went Wrong")
+      toast.error("Something Went Wrong");
     }
   };
 
-  const resendOtp =async (e:SyntheticEvent) => {
+  const resendOtp = async (e: SyntheticEvent) => {
     try {
-        e.preventDefault()
-        await AuthServices.resendOtp(email)
-        setTimer(60)
+      e.preventDefault();
+      await AuthServices.resendOtp(email);
+      setTimer(60);
     } catch (error) {
-        toast.error("Something Went Wrong")
+      toast.error("Something Went Wrong");
     }
   };
   return (
@@ -75,9 +75,9 @@ function VerifyOtp() {
             />
           </div>
         </div>
-        {
-            timer > 0 &&  <span className=" flex justify-center text-white">00:{timer}</span>
-        }
+        {timer > 0 && (
+          <span className=" flex justify-center text-white">00:{timer}</span>
+        )}
         {timer > 0 ? (
           <button
             type="submit"
