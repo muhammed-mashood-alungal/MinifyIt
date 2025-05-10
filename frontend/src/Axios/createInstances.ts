@@ -9,3 +9,4 @@ const createAxiosInstance = (baseUrl: string) => {
 };
 
 export const authInstance = createAxiosInstance(`http://localhost:5000/auth/`)
+export const urlInstance = createAxiosInstance(`http://localhost:5000/url/`)

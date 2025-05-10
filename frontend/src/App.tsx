@@ -8,6 +8,7 @@ import Home from './pages/HomePage/HomePage'
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react'
 import { useAuth } from './Context/auth.context'
+import UrlRedirectionPage from './pages/UrlRedirectionPage/UrlRedirectionPage'
 
 function App() {
  
@@ -26,6 +27,7 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path="/signup" element={<Signup />} />
        <Route path="/verify-otp" element={<VerifyOtpPage />} />
+       <Route path='/:shortCode' element={<UrlRedirectionPage/>}/>
      </Routes>
      <Toaster/>
     </BrowserRouter>

@@ -15,7 +15,7 @@ function VerifyOtp() {
   const [timer, setTimer] = useState(60);
   const location = useLocation()
   const navigate = useNavigate()
-  const email  = location?.state?.email
+  let email  = location?.state?.email
 
   useEffect(() => {
     if (timer > 0) {
@@ -28,6 +28,7 @@ function VerifyOtp() {
   useEffect(()=>{
     if(!email){
         navigate('/signup')
+        email = null
     }
   },[])
 
@@ -48,7 +49,15 @@ function VerifyOtp() {
     }
   };
 
-  const resendOtp = () => {};
+  const resendOtp =async (e:SyntheticEvent) => {
+    try {
+        e.preventDefault()
+        await AuthServices.resendOtp(email)
+        setTimer(60)
+    } catch (error) {
+        toast.error("Something Went Wrong")
+    }
+  };
   return (
     <>
       <form className="space-y-4" onSubmit={handleSubmit}>

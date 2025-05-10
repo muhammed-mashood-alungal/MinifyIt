@@ -1,12 +1,15 @@
 import { CheckCircle, Copy, ExternalLink, Link, XCircle } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
+import { UrlServices } from "../Services/url.services";
+import { useAuth } from "../Context/auth.context";
 
 function UrlShortner() {
   const [longUrl, setLongUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const shortenUrl = () => {
+  const { user } = useAuth();
+  const shortenUrl = async () => {
     // Reset states
     setError("");
     setShortUrl("");
@@ -24,31 +27,21 @@ function UrlShortner() {
 
     // Simulate API call
     setIsLoading(true);
-    setTimeout(() => {
-      // Generate a random short URL for demo purposes
-      const randomString = Math.random().toString(36).substring(2, 8);
-      const newShortUrl = `min.fy/${randomString}`;
-      setShortUrl(newShortUrl);
-
-      // Add to history
-      const newEntry = {
-        original: longUrl,
-        shortened: newShortUrl,
-        clicks: 0,
-        date: new Date().toISOString().split("T")[0],
-      };
-
-      setUrlHistory([newEntry, ...urlHistory]);
-      setIsLoading(false);
-    }, 1000);
+    console.log('sending' , longUrl , user?.id)
+    const newShortUrl = await UrlServices.createShortUrl(
+      longUrl,
+      user?.id as string
+    );
+    setShortUrl(newShortUrl);
+    setIsLoading(false)
   };
 
-  const handleUrlChange = (e : ChangeEvent<HTMLInputElement>) => {
+  const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLongUrl(e.target.value);
-    setError('');
+    setError("");
   };
 
-  const validateUrl = (url : string) => {
+  const validateUrl = (url: string) => {
     try {
       new URL(url);
       return true;
@@ -57,33 +50,35 @@ function UrlShortner() {
     }
   };
 
-  
   const [copySuccess, setCopySuccess] = useState(false);
   const [urlHistory, setUrlHistory] = useState([
-    { original: 'https://www.example.com/very/long/url/that/nobody/wants/to/type/or/remember', 
-      shortened: 'min.fy/abc123', 
-      clicks: 24, 
-      date: '2025-05-08' },
-    { original: 'https://another-very-long-example.com/with/multiple/parameters?id=123&type=example', 
-      shortened: 'min.fy/def456', 
-      clicks: 12, 
-      date: '2025-05-09' }
+    {
+      original:
+        "https://www.example.com/very/long/url/that/nobody/wants/to/type/or/remember",
+      shortened: "min.fy/abc123",
+      clicks: 24,
+      date: "2025-05-08",
+    },
+    {
+      original:
+        "https://another-very-long-example.com/with/multiple/parameters?id=123&type=example",
+      shortened: "min.fy/def456",
+      clicks: 12,
+      date: "2025-05-09",
+    },
   ]);
 
-  
-
-  
-  const copyToClipboard = (text : string) => {
-    navigator.clipboard.writeText(text)
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard
+      .writeText(text)
       .then(() => {
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2000);
       })
       .catch(() => {
-        setError('Failed to copy URL');
+        setError("Failed to copy URL");
       });
   };
-
 
   return (
     <>
@@ -136,7 +131,7 @@ function UrlShortner() {
                 <div>
                   <p className="text-sm text-gray-400">Your shortened URL:</p>
                   <a
-                    href={`https://${shortUrl}`}
+                    href={shortUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-lg font-medium text-indigo-400 hover:text-indigo-300 flex items-center"
@@ -146,7 +141,7 @@ function UrlShortner() {
                   </a>
                 </div>
                 <button
-                  onClick={() => copyToClipboard(`https://${shortUrl}`)}
+                  onClick={() => copyToClipboard(shortUrl)}
                   className="flex items-center space-x-1 px-3 py-2 bg-gray-800 rounded-md hover:bg-gray-700 text-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   {copySuccess ? (

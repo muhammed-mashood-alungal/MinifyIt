@@ -2,6 +2,24 @@ import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState, type ChangeEvent, type SyntheticEvent } from "react";
 import { AuthServices } from "../Services/auth.services";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+import toast from "react-hot-toast";
+
+const signupSchema = z
+  .object({
+    username: z
+      .string()
+      .trim()
+      .min(2, "Name must be at least 2 characters")
+      .regex(/^(?!\s*$).+/, "Name cannot be empty or spaces only"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +30,12 @@ function SignupForm() {
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState<{
+    username?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -19,12 +43,27 @@ function SignupForm() {
   };
 
   const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
-    console.log("Signup submitted", formData);
-    const response = await AuthServices.signUp(formData);
-    console.log(response);
-    navigate('/verify-otp',{state:{email:formData.email}})
+    try {
+      e.preventDefault();
+    const validation = signupSchema.safeParse(formData);
+    if (!validation.success) {
+      const fieldErrors: typeof errors = {};
+      validation.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof typeof errors;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
+    await AuthServices.signUp(formData);
+    navigate('/verify-otp',{state:{email:formData.email}});
+    } catch (error : unknown) {
+      toast.error((error as Error).message || "Something Went While SignUp")
+    }
+    
   };
+
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div>
@@ -34,13 +73,14 @@ function SignupForm() {
           <input
             type="text"
             name="username"
-            required
+            
             placeholder="John Doe"
             className="pl-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
             value={formData.username}
           />
         </div>
+        {errors.username && <p className="text-sm text-red-500 mt-1">{errors.username}</p>}
       </div>
 
       <div>
@@ -50,13 +90,14 @@ function SignupForm() {
           <input
             type="email"
             name="email"
-            required
+            
             placeholder="you@example.com"
             className="pl-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
             value={formData.email}
           />
         </div>
+        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
       </div>
 
       <div>
@@ -66,7 +107,7 @@ function SignupForm() {
           <input
             type={showPassword ? "text" : "password"}
             name="password"
-            required
+            
             placeholder="••••••••"
             className="pl-10 pr-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
@@ -84,6 +125,7 @@ function SignupForm() {
             )}
           </button>
         </div>
+        {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
       </div>
 
       <div>
@@ -93,13 +135,14 @@ function SignupForm() {
           <input
             type={showPassword ? "text" : "password"}
             name="confirmPassword"
-            required
+            
             placeholder="••••••••"
             className="pl-10 py-3 w-full rounded bg-gray-900 border border-gray-700 text-gray-300"
             onChange={handleInputChange}
             value={formData.confirmPassword}
           />
         </div>
+        {errors.confirmPassword && <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>}
       </div>
 
       <button

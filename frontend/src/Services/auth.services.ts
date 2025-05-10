@@ -1,4 +1,3 @@
-import toast from "react-hot-toast";
 import { authInstance } from "../Axios/createInstances";
 
 export const AuthServices = {
@@ -7,10 +6,8 @@ export const AuthServices = {
       console.log(formData);
       const response = await authInstance.post("/signup", formData);
       return response;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error ? error?.message : "Something Went Wrong"
-      );
+    } catch (error: any) {
+      throw new Error(error?.response?.data?.message || "Something Went Wrong");
     }
   },
   signIn: async (formData: any) => {
@@ -19,30 +16,24 @@ export const AuthServices = {
       console.log(response);
       localStorage.setItem("minify_token", response?.data?.token);
       return response;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error ? error?.message : "Something Went Wrong"
-      );
+    } catch (error: any) {
+      throw new Error(error?.response?.data?.message || "Something Went Wrong");
     }
   },
   resendOtp: async (email: any) => {
     try {
       const response = await authInstance.post("/resend-otp", { email });
       return response;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error ? error?.message : "Something Went Wrong"
-      );
+    } catch (error: any) {
+      throw new Error(error?.response?.data?.message || "Something Went Wrong");
     }
   },
   verifyOtp: async (email: string, otp: string) => {
     try {
       const response = await authInstance.post("/verify-otp", { email, otp });
       return response;
-    } catch (error: unknown) {
-      throw new Error(
-        error instanceof Error ? error?.message : "Something Went Wrong"
-      );
+    } catch (error: any) {
+     throw new Error(error?.response?.data?.message || "Something Went Wrong");
     }
   },
   authMe: async (): Promise<{ id: string; email: string } | undefined> => {
@@ -57,12 +48,9 @@ export const AuthServices = {
           },
         }
       );
-      console.log(response.data)
       return response.data.user;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error ? error?.message : "Something Went Wrong"
-      );
+    } catch (error : any) {
+      throw new Error(error?.response?.data?.message || "Something Went Wrong");
     }
   },
 };

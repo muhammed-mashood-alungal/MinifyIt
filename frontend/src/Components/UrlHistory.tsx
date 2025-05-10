@@ -1,23 +1,21 @@
 import { Clipboard, Copy, CopyCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { UrlServices } from "../Services/url.services";
+import { useAuth } from "../Context/auth.context";
 
 function UrlHistory() {
-  const [urlHistory, setUrlHistory] = useState([
-    {
-      original:
-        "https://www.example.com/very/long/url/that/nobody/wants/to/type/or/remember",
-      shortened: "min.fy/abc123",
-      clicks: 24,
-      date: "2025-05-08",
-    },
-    {
-      original:
-        "https://another-very-long-example.com/with/multiple/parameters?id=123&type=example",
-      shortened: "min.fy/def456",
-      clicks: 12,
-      date: "2025-05-09",
-    },
-  ]);
+  const [urlHistory, setUrlHistory] = useState([]);
+
+  const { user } = useAuth();
+  useEffect(() => {
+    const fetchLinksHistory = async () => {
+      try {
+        const links = await UrlServices.getMyLinks(user?.id as string);
+        setUrlHistory(links);
+      } catch (error) {}
+    };
+    fetchLinksHistory();
+  });
   const [copySuccess, setCopySuccess] = useState(false);
   const copyToClipboard = (text: string) => {
     navigator.clipboard
@@ -50,42 +48,30 @@ function UrlHistory() {
                   Short URL
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Clicks
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Copy
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {urlHistory.map((url, index) => (
+              {urlHistory.map((url : any, index) => (
                 <tr key={index}>
                   <td className="px-4 py-3 text-sm text-gray-300">
-                    <div className="truncate max-w-xs">{url.original}</div>
+                    <div className="truncate max-w-xs">{url.originalUrl}</div>
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <a
-                      href={`https://${url.shortened}`}
+                      href={url.shortUrl}
                       className="text-indigo-400 hover:text-indigo-300"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {url.shortened}
+                      {url.shortUrl}
                     </a>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-300">
-                    {url.clicks}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-300">
-                    {url.date}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <button
                       onClick={() =>
-                        copyToClipboard(`https://${url.shortened}`)
+                        copyToClipboard(url.shortUrl)
                       }
                       className="p-1 text-gray-400 hover:text-indigo-400 focus:outline-none"
                     >
