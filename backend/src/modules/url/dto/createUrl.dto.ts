@@ -1,7 +1,7 @@
 import { IsString, IsUrl } from "class-validator";
 
 export class CreateUrlDto {
-    @IsUrl()
+    @IsString()
     originalUrl: string
 
     @IsString()

@@ -53,7 +53,7 @@ export class AuthController {
   }
   @Post('me')
   async authMe(@Req() req: Request, @Res() res: Response) {
-    console.log('HIT ')
+    
     const header = req.headers.authorization;
     if (!header || header.startsWith('Bearer ')) {
       throw new HttpException(

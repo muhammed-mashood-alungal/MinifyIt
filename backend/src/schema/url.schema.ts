@@ -6,7 +6,7 @@ export type UrlDocument = HydratedDocument<Url>
 @Schema()
 export class Url {
     @Prop()
-    orginalUrl : string;
+    originalUrl : string;
 
     @Prop()
     shortCode : string;
@@ -19,4 +19,4 @@ export class Url {
 
 }
 
-export const UserSchema = SchemaFactory.createForClass(Url)
+export const UrlSchema = SchemaFactory.createForClass(Url)  

@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../dto/createUserDto.dto';
 import { UserRepository } from '../../repositories/user.repositories';
 import { hashPassword, validatePassword } from 'src/common/utils/bcrypt.util';
@@ -12,12 +18,11 @@ import { LoginDto } from '../../dto/login.dto';
 import { generateToken, verifyToken } from 'src/common/utils/jwt.util';
 import { UserDocument } from 'src/schema/user.schema';
 
-
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
-     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -35,65 +40,54 @@ export class AuthService {
     const otp = generateOtp();
     await sendOtp(userData.email, otp);
 
-    
     const email = userData.email;
-    
-      const dataToStore = {
-        ...userData,
-        password: hashedPassword,
-        otp,
-      };
-      
-      await this.cacheManager.set(email, dataToStore, 600000);
-      
-      
-      const cachedData = await this.cacheManager.get(email);
-      
-      
-      if (!cachedData) {
-        throw new HttpException(
-          HttpResponse.OTP_STORING_FAILED,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+
+    const dataToStore = {
+      ...userData,
+      password: hashedPassword,
+      otp,
+    };
+
+    await this.cacheManager.set(email, dataToStore, 600000);
+
+    const cachedData = await this.cacheManager.get(email);
+
+    if (!cachedData) {
+      throw new HttpException(
+        HttpResponse.OTP_STORING_FAILED,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-
   async verifyOtp(email: string, otp: string) {
-      const cachedData = await this.cacheManager.get(email) as any;
-      
-      if (!cachedData) {
-        throw new HttpException(
-         HttpResponse.INVALID_OTP,
-          HttpStatus.BAD_REQUEST
-        );
-      }
-      const userData = cachedData;
-      
-      if (userData.otp != otp) {
-        throw new HttpException(HttpResponse.INVALID_OTP, HttpStatus.BAD_REQUEST);
-      }
+    const cachedData = (await this.cacheManager.get(email)) as any;
 
-     
-      delete userData.otp;
+    if (!cachedData) {
+      throw new HttpException(HttpResponse.INVALID_OTP, HttpStatus.BAD_REQUEST);
+    }
+    const userData = cachedData;
 
-      
-      await this.userRepository.createUser(userData);
+    if (userData.otp != otp) {
+      throw new HttpException(HttpResponse.INVALID_OTP, HttpStatus.BAD_REQUEST);
+    }
+
+    delete userData.otp;
+
+    await this.userRepository.createUser(userData);
   }
   async resendOtp(email: string) {
     const otp = generateOtp();
     await sendOtp(email, otp);
-    const prevUserData = JSON.parse(
-      (await this.cacheManager.get(email)) as string,
-    );
+    const prevUserData = (await this.cacheManager.get(email)) as any;
     await this.cacheManager.set(
       email,
-      JSON.stringify({
+      {
         ...prevUserData,
         otp: otp,
-      }),
-      3600,
-    );   
+      },
+      600000,
+    );
   }
 
   async signIn(signInData: LoginDto): Promise<string> {
@@ -106,7 +100,8 @@ export class AuthService {
       );
     }
 
-    const isVerified = validatePassword(signInData.password, user.password);
+    const isVerified = await validatePassword(signInData.password, user.password);
+    console.log(isVerified)
     if (!isVerified) {
       throw new HttpException(
         HttpResponse.INVALID_CREDITIAL,
@@ -118,9 +113,8 @@ export class AuthService {
     const token = await generateToken(payload);
     return token;
   }
-  async authMe(token: string): Promise<{id:string , email : string}> {
+  async authMe(token: string): Promise<{ id: string; email: string }> {
     const payload = await verifyToken(token);
-    console.log(payload)
     const user = await this.userRepository.getUserByEmail(payload.email);
     if (!user) {
       throw new HttpException(

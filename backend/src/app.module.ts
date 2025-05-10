@@ -4,10 +4,7 @@ import { UrlModule } from './modules/url/url.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { env } from './modules/configs/env.config';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { Keyv } from 'keyv';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { CacheableMemory } from 'cacheable';
-import { createKeyv } from '@keyv/redis';
 import { redisStore } from 'cache-manager-redis-store';
 
 
